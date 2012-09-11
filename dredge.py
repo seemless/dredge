@@ -5,15 +5,17 @@ import sys
 def main(args):
     context = None
     counter = 0
-    
+    boards = ['g']
     #try:
     #    context = get_context(args[1])
     #except Exception as e:
     #    print("Error: unable to get context, exiting.")
     #    sys.exit(1)
-    
-    get_threads("b")
-
+    for board in boards:
+        nums = gen_thread_numbers(board)
+        threads = gen_thread(board, nums)
+        for thread in threads:
+            print thread
     #for i in xrange(477000,478000):
     #    final_url = url_template % ("po",i)
     #    r = requests.get(final_url)
@@ -25,11 +27,24 @@ def main(args):
     #    
     #print counter
 
+def gen_thread(board,numbers):
+    #board , thread number
+    for num in numbers:
+        url = "https://api.4chan.org/%s/res/%d.json" % (board, num)
+        r = requests.get(url)
+        yield r.content
     
-def get_threads(board, page=None):
-    board_home_template = "http://www.4chan.org"
-    soup = BeautifulSoup('<head></head>')
-    print soup
+def gen_thread_numbers(board, page=0):
+    '''generates thread numbers from the 4chan boards. An optional page
+    argument is provided to access non frontpage material.'''
+    url = "http://boards.4chan.org/%s/%d" % (board,page)
+    r = requests.get(url)
+    soup = BeautifulSoup(r.content)
+    threads = soup.find_all(class_="thread")
+    
+    for thread in threads:
+        yield int(str(thread['id'])[1:])
+        
 def get_context(input_location):
     '''gives the context of the database by providing metadata.
     Returns a dictionary of all the configurations needed to continue
@@ -55,8 +70,5 @@ board_map = {"g":"Technology",
 
 # board, image number, extension
 image_url_template = "images.4chan.org/%s/src/%d.%s" 
-
-#board , thread number
-url_template = "https://api.4chan.org/%s/res/%d.json"
 
 if __name__=="__main__": main(sys.argv[1:])
