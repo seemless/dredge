@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -71,21 +72,6 @@ def gen_thread_numbers(board, num_pages):
         for thread in threads:
             yield int(str(thread['id'])[1:])
         
-def get_context(input_location):
-    '''gives the context of the database by providing metadata.
-    Returns a dictionary of all the configurations needed to continue
-    ingest of 4chan boards.'''
-    
-    context = {}
-    #flat file implementation
-    if os.path.isfile(input_location):
-        with open(input_location) as f:
-            for line in f:
-                k,v = line.split("\t")
-                context[k] = v
-                
-    return context
-
 ##### CONSTANTS ######
 #helping me remember what all the abbrevs are for
 board_map = {"g":"Technology",
